@@ -35,7 +35,7 @@ class CarModel(models.Model):
     COUPE = "Coupe"
     PICKUP = "Pickup"
     OTHER = "Other"
-    CAR_CHOICES = [(SEDAN, "Sedan"), (SUV, "SUV"), (HATCH, "Hatch"), (COUPE, "Coupe"), (PICKUP, "Pick-up truck"), (OTHER, 'Other')]
+    CAR_CHOICES = [(SEDAN, "Sedan"), (SUV, "SUV"), (HATCH, "Hatch"), (COUPE, "Coupe"), (PICKUP, "Pick-up"), (OTHER, "Other")]
     model_type = models.CharField(
         null=False, max_length=15, choices=CAR_CHOICES, default=SEDAN)
 
