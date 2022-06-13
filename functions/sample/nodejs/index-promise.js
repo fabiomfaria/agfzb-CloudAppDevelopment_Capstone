@@ -3,7 +3,6 @@
  */
 
 const Cloudant = require('@cloudant/cloudant');
-const { IamAuthenticator } = require('ibm-cloud-sdk-core');
 
 function main(params) {
 
