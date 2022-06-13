@@ -58,13 +58,13 @@ def _get_dealers_from_cf_by_url(url):
 
 
 def get_dealers_from_cf():
-    return _get_dealers_from_cf_by_url("https://...us-south.apigw.appdomain.cloud/api/dealership")
+    return _get_dealers_from_cf_by_url("https://fffinal.us-south.apigw.appdomain.cloud/api/dealership")
 
 def get_dealer_by_id_from_cf(dealer_id):
-    return _get_dealers_from_cf_by_url(f"https://...us-south.apigw.appdomain.cloud/api/dealership?dealer_id={dealer_id}")
+    return _get_dealers_from_cf_by_url(f"https://fffinal.us-south.apigw.appdomain.cloud/api/dealership?dealer_id={dealer_id}")
 
 def get_dealers_by_state_from_cf(state):
-    return _get_dealers_from_cf_by_url(f"https://...us-south.apigw.appdomain.cloud/api/dealership?state={state}")
+    return _get_dealers_from_cf_by_url(f"https://fffinal.us-south.apigw.appdomain.cloud/api/dealership?state={state}")
   
   
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
@@ -73,7 +73,7 @@ def get_dealers_by_state_from_cf(state):
 # - Parse JSON results into a DealerView object list
 def get_dealer_reviews_from_cf(dealerId):
     results = []
-    json_result = get_request(f"https://.us-south.apigw.appdomain.cloud/api/review/?dealerId={dealerId}")
+    json_result = get_request(f"https://fffinal.us-south.apigw.appdomain.cloud/api/review/?dealerId={dealerId}")
     if json_result and "body" in json_result:
         reviews = json_result["body"]
         # print(reviews)
