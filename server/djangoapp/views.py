@@ -70,7 +70,7 @@ def registration_request(request):
         else:
             context['message'] = "User already exists."
             return render(request, 'djangoapp/registration.html', context)
-
+"""
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
     if request.method == "GET":
@@ -130,4 +130,4 @@ def add_review(request, dealer_id):
             json_payload = {}
             json_payload["review"] = review
             result = post_review(urlreview, json_payload)
-    return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+    return redirect("djangoapp:dealer_details", dealer_id=dealer_id) """

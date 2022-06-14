@@ -7,7 +7,7 @@ from ibm_watson import NaturalLanguageUnderstandingV1, ApiException
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
 
-# Create a `get_request` to make HTTP GET requests
+"""# Create a `get_request` to make HTTP GET requests
 # e.g., response = requests.get(url, params=params, headers={'Content-Type': 'application/json'},
 #                                     auth=HTTPBasicAuth('apikey', api_key))
 def get_request(url, **kwargs):
@@ -99,7 +99,7 @@ def get_dealer_reviews_from_cf(url, dealerId):
 # Create an `analyze_review_sentiments` method to call Watson NLU and analyze text
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
-# - Get the returned sentiment label such as Positive or Negative """
+# - Get the returned sentiment label such as Positive or Negative
 def analyze_review_sentiments(text):
     # Note: I'm going to follow IBM NLU API instead because Course Lab example doesn't work.
     NLU_API_KEY = 'HWREf8jdoh868vaURWTDaEoY_N0pti6BH_rv6kbtuVBj' 
@@ -157,4 +157,4 @@ def add_review_to_cf(json_payload):
         results.append({
             "reviewId" : reviewId
             })
-    return results
+    return results """
