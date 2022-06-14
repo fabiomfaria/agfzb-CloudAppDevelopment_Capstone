@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse
 from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404, render, redirect
 from .models import CarModel, CarMake
-# from .restapis import get_dealers_from_cf, get_dealers_by_state_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf, add_review_to_cf
+from .restapis import get_dealers_from_cf, get_dealers_by_state_from_cf, get_dealer_by_id_from_cf, get_dealer_reviews_from_cf, add_review_to_cf
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 from datetime import datetime
@@ -68,8 +68,12 @@ def registration_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
-    context = {}
     if request.method == "GET":
+        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
+        dealerships = get_dealers_from_cf(url)
+        context = {}
+        context["dealerships"] = dealerships
+
         return render(request, 'djangoapp/index.html', context)
 
 
@@ -78,9 +82,9 @@ def get_dealerships(request):
 # ...
 def get_dealer_details(request, dealer_id):
     if request.method == "GET":
-        url = "  "    
+        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_reviews"    
         reviews = get_dealer_reviews_from_cf(url, dealer_id)
-        url = " "
+        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
         dealership = get_dealers_from_cf(url, dealerId=dealer_id)
         if len(dealership) == 0:
             return redirect('djangoapp:index')
@@ -96,7 +100,7 @@ def add_review(request, dealer_id):
     context = {}
     if request.user.is_authenticated:
         if request.method == 'GET':
-            url = " "
+            url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
             dealership = get_dealers_from_cf(url, dealerId=dealer_id)
             if len(dealership) == 0:
                 return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
@@ -124,6 +128,6 @@ def add_review(request, dealer_id):
             
             json_payload = {}
             json_payload["review"] = review
-            url = "  "
+            url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/post_review"
             result = post_review(url, json_payload)
     return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
