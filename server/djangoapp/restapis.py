@@ -84,7 +84,7 @@ def get_dealer_reviews_from_cf(dealerId):
 # - Get the returned sentiment label such as Positive or Negative """
 def analyze_review_sentiments(text):
     # Note: I'm going to follow IBM NLU API instead because Course Lab example doesn't work.
-    NLU_API_KEY = 'HWREf8jdoh868vaURWTDaEoY_N0pti6BH_rv6kbtuVBj'
+    #NLU_API_KEY = 
     NLU_API_URL = 'https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/21494ebd-affd-4dcb-8282-b543ddf213b5'
     sentiment = "neutral"
 
