@@ -3,7 +3,7 @@ import json
 from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
-""" from ibm_watson import NaturalLanguageUnderstandingV1, ApiException
+from ibm_watson import NaturalLanguageUnderstandingV1, ApiException
 from ibm_cloud_sdk_core.authenticators import IAMAuthenticator
 from ibm_watson.natural_language_understanding_v1 import Features, EntitiesOptions, KeywordsOptions
 
@@ -14,13 +14,10 @@ def get_request(url, api_key = None, **kwargs):
     print(kwargs)
     try:
         if api_key is not None and len(api_key) > 0:
-            print("GET from {} with AUTH".format(url))
             response = requests.get(url, headers={'Content-Type': 'application/json'}, params=kwargs, auth=HTTPBasicAuth('api_key', api_key))
         else:
-            print("GET from {} ".format(url))    
             response = requests.get(url, headers={'Content-Type': 'application/json'}, params=kwargs)
     except:
-        # If any error occurs 
         print("Network exception occurred")
     status_code = response.status_code
     print("With status {} ".format(status_code))
@@ -32,10 +29,8 @@ def get_request(url, api_key = None, **kwargs):
 def post_request(url, json_payload, **kwargs):
     print(kwargs)
     try:
-        print("POST from {} ".format(url))    
         response = requests.post(url, headers={'Content-Type': 'application/json'}, params=kwargs, json=json_payload)
     except:
-        # If any error occurs 
         print("Network exception occurred")
     status_code = response.status_code
     print("With status {} ".format(status_code))
@@ -58,13 +53,13 @@ def _get_dealers_from_cf_by_url(url):
 
 
 def get_dealers_from_cf():
-    return _get_dealers_from_cf_by_url("https://fffinal.us-south.apigw.appdomain.cloud/api/dealership")
+    return _get_dealers_from_cf_by_url("https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships")
 
 def get_dealer_by_id_from_cf(dealer_id):
-    return _get_dealers_from_cf_by_url(f"https://fffinal.us-south.apigw.appdomain.cloud/api/dealership?dealer_id={dealer_id}")
+    return _get_dealers_from_cf_by_url(f"https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships?dealer_id={dealer_id}")
 
 def get_dealers_by_state_from_cf(state):
-    return _get_dealers_from_cf_by_url(f"https://fffinal.us-south.apigw.appdomain.cloud/api/dealership?state={state}")
+    return _get_dealers_from_cf_by_url(f"https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships?state={state}")
   
   
 # Create a get_dealer_reviews_from_cf method to get reviews by dealer id from a cloud function
@@ -73,7 +68,7 @@ def get_dealers_by_state_from_cf(state):
 # - Parse JSON results into a DealerView object list
 def get_dealer_reviews_from_cf(dealerId):
     results = []
-    json_result = get_request(f"https://fffinal.us-south.apigw.appdomain.cloud/api/review/?dealerId={dealerId}")
+    json_result = get_request(f"https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_reviews/?dealerId={dealerId}")
     if json_result and "body" in json_result:
         reviews = json_result["body"]
         # print(reviews)
@@ -91,4 +86,15 @@ def get_dealer_reviews_from_cf(dealerId):
 # - Get the returned sentiment label such as Positive or Negative """
 
 
-
+def add_review_to_cf(json_payload):
+    results = []
+    url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/post_review"
+    json_result = post_request(url, json_payload=json_payload)
+    print(f"json_result={json_result}")
+    if json_result and "body" in json_result:
+        reviewId = json_result["body"]
+        print(f"reviewId={reviewId}")
+        results.append({
+            "reviewId" : reviewId
+            })
+    return results
