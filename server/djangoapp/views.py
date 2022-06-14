@@ -68,66 +68,64 @@ def registration_request(request):
 
 # Update the `get_dealerships` view to render the index page with a list of dealerships
 def get_dealerships(request):
+    context = {}
     if request.method == "GET":
-        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
-        dealerships = get_dealers_from_cf(url)
-        context = {}
-        context["dealerships"] = dealerships
-
-        return render(request, 'djangoapp/index.html', context)
+        dealerships = get_dealers_from_cf()
+        context["dealers"] = dealerships
+    return render(request, 'djangoapp/index.html', context)
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
 # def get_dealer_details(request, dealer_id):
 # ...
 def get_dealer_details(request, dealer_id):
+    context = {}
     if request.method == "GET":
-        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_reviews"    
-        reviews = get_dealer_reviews_from_cf(url, dealer_id)
-        url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
-        dealership = get_dealers_from_cf(url, dealerId=dealer_id)
-        if len(dealership) == 0:
-            return redirect('djangoapp:index')
-        context = {}
-        context["reviews"] = reviews
-        context["dealership"] = dealership[0]
-        return render(request, 'djangoapp/dealer_details.html', context)
+        dealers = get_dealer_by_id_from_cf(dealer_id)
+        context["dealer"] = None
+        if len(dealers) > 0:
+            context["dealer"] = dealers[0]
+        context["reviews"] = get_dealer_reviews_from_cf(dealer_id)
+    return render(request, "djangoapp/dealer_details.html", context)
 
 # Create a `add_review` view to submit a review
 # def add_review(request, dealer_id):
 # ...
 def add_review(request, dealer_id):
+    if request.method == "POST":
+        if request.user is not None and request.user.is_authenticated:
+            print("POST something.")
+            POST = request.POST
+            review = {
+                "dealership" : dealer_id,
+                "name" : f"{request.user.first_name} {request.user.last_name}",
+                "purchase" : ("purchase" in POST and POST["purchase"] == "on"),
+                "purchase_date" : POST["purchase_date"],
+                "review" : POST["review"],
+                }
+
+            review["car_make"] = "undefined"
+            review["car_model"] = "undefined"
+            review["car_year"] = 1800
+            post_carId = POST["car"]
+            car_models = get_all_cars_by_dealer(dealer_id)
+            if car_models and post_carId in car_models:
+                car = car_models[post_carId]
+                review["car_make"] = car.makeId.name
+                review["car_model"] = car.name
+                review["car_year"] = car.year.year
+                
+            json_payload = { "review" : review }
+            print(f"json_payload={json_payload}")
+            result = add_review_to_cf(json_payload)
+            if result and len(result) > 0:
+                print(f"POST add_review_to_cf SUCCESS! reviewId={result[0]['reviewId']}")
+                return redirect('djangoapp:dealer', dealer_id=dealer_id)
+    # GET part
     context = {}
-    if request.user.is_authenticated:
-        if request.method == 'GET':
-            url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships"
-            dealership = get_dealers_from_cf(url, dealerId=dealer_id)
-            if len(dealership) == 0:
-                return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
-            carModel = CarModel.objects.all().filter(dealer_id=int(dealer_id))
-            context["dealership"] = dealership[0]
-            context["cars"] = carModel
-            return render(request, 'djangoapp/add_review.html', context)
-        elif request.method == 'POST':
-            review = {}
-            review["time"] = datetime.utcnow().isoformat()
-            review["name"] = request.user.username
-            review["dealership"] = dealer_id
-            review["review"] = request.POST["content"]
-            review["purchase"] = True if "purchasecheck" in request.POST and request.POST["purchasecheck"] == 'on' else False
-            review["purchase_date"] = request.POST["purchasedate"]
-            cars = request.POST["car"].split("#")
-            try:
-                review["car_model"] = CarModel.objects.get(id=int(cars[0])).name
-                review["car_year"] = CarModel.objects.get(id=int(cars[0])).year.year
-                review["car_make"] = CarMake.objects.get(id=int(cars[0])).name
-            except:
-                review["car_model"] = ""
-                review["car_make"] = ""
-                review["car_year"] = ""
-            
-            json_payload = {}
-            json_payload["review"] = review
-            url = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/post_review"
-            result = post_review(url, json_payload)
-    return redirect("djangoapp:dealer_details", dealer_id=dealer_id)
+    dealers = get_dealer_by_id_from_cf(dealer_id)
+    context["dealer"] = None
+    context["cars"] = get_all_cars_options_by_dealer(dealer_id)
+    if len(dealers) > 0:
+        context["dealer"] = dealers[0]
+    return render(request, "djangoapp/add_review.html", context)
