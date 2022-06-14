@@ -71,10 +71,8 @@ def get_dealer_reviews_from_cf(dealerId):
     json_result = get_request(f"https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_reviews/?dealerId={dealerId}")
     if json_result and "body" in json_result:
         reviews = json_result["body"]
-        # print(reviews)
         for review in reviews:
             review['sentiment'] = analyze_review_sentiments(review['review'])
-            # print(f"review={review}")
             results.append(DealerReview.create(review))
     return results
 
@@ -84,6 +82,50 @@ def get_dealer_reviews_from_cf(dealerId):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative """
+def analyze_review_sentiments(text):
+    # Note: I'm going to follow IBM NLU API instead because Course Lab example doesn't work.
+    NLU_API_KEY = 'HWREf8jdoh868vaURWTDaEoY_N0pti6BH_rv6kbtuVBj'
+    NLU_API_URL = 'https://api.us-south.natural-language-understanding.watson.cloud.ibm.com/instances/21494ebd-affd-4dcb-8282-b543ddf213b5'
+    sentiment = "neutral"
+
+    authenticator = IAMAuthenticator(NLU_API_KEY)
+    natural_language_understanding = NaturalLanguageUnderstandingV1(
+        version='2021-08-01',
+        authenticator=authenticator
+        )
+
+    natural_language_understanding.set_service_url(NLU_API_URL)
+
+    print(f"Analyzing sentiment for: {text}")
+    try:
+        word_count = math.ceil(len(text.split()) / 2)
+        if word_count <= 0:
+            word_count = 1
+        response = natural_language_understanding.analyze(
+            text=text,
+            features=Features(
+                keywords=KeywordsOptions(emotion=False, sentiment=True, limit=word_count)
+                )
+            ).get_result()
+        if "keywords" in response:
+            keywords = response['keywords']
+            sentiment_tally = {
+                "positive" : 0,
+                "negative" : 0,
+                "neutral" : 0
+                }
+            highest = "neutral"
+            for keyword in keywords:
+                key = keyword['sentiment']['label']
+                sentiment_tally[key] += 1
+                if sentiment_tally[key] > sentiment_tally[highest]:
+                    highest = key
+            sentiment = highest
+        print(json.dumps(response, indent=2))
+    except ApiException as ae:
+        print("NLU ApiException: {}".format(ae))
+    print(f"Final sentiment: {sentiment}")
+    return sentiment
 
 
 def add_review_to_cf(json_payload):
