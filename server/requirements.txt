@@ -2,3 +2,6 @@ requests
 Django
 gunicorn
 Pillow
+ibm_watson
+ibm_cloud_sdk_core
+PyJWT == 1.7.1
