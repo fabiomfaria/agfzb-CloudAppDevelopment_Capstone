@@ -10,10 +10,10 @@ from datetime import datetime
 import logging
 import json
 
-# var
+""" # var
 urldealerships = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_dealerships/"
 urlreviews = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/get_reviews/"
-urlreview = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/post_review/"
+urlreview = "https://5dbcd2a2.us-south.apigw.appdomain.cloud/dealership/post_review/""""
 
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
